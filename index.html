@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Shopee Core</title>
+    <style>
+        :root {
+            --shopee-orange: #ee4d2d;
+            --bg-dark: #000000;
+            --panel-bg: #101524;
+            --text-color: #ffffff;
+            --muted-color: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-color); min-height: 100vh; overflow: hidden; position: relative; }
+
+        /* ====== TELA DE LOGIN (PRETA) ====== */
+        .login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .login-box { width: 100%; max-width: 360px; padding: 2rem; text-align: center; }
+        .login-box h1 { color: var(--shopee-orange); font-size: 1.8rem; margin-bottom: 2rem; letter-spacing: 1px; }
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--muted-color); margin-bottom: 4px; }
+        .input-group input { width: 100%; padding: 0.75rem; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 1rem; }
+        .input-group input:focus { border-color: var(--shopee-orange); outline: none; }
+        .btn-login { width: 100%; padding: 0.85rem; background: var(--shopee-orange); border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+        .btn-login:hover { background: #d73c1f; }
+        .status-msg { margin-top: 1rem; font-family: monospace; font-size: 0.85rem; color: #00ff66; min-height: 20px; }
+
+        /* ====== BOTÃO FLUTUANTE SIMULADO ====== */
+        .floating-btn {
+            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+            background-color: var(--shopee-orange); border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #fff;
+            cursor: pointer; display: none; overflow: hidden; z-index: 999;
+        }
+        .floating-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ====== PAINEL PRINCIPAL DE FUNÇÕES ====== */
+        .main-panel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100%; max-width: 400px; background: var(--panel-bg);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+            padding: 1.5rem; box-shadow: 0 10px 35px rgba(0,0,0,0.6);
+            display: none; z-index: 1000;
+        }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #242b3d; padding-bottom: 0.8rem; margin-bottom: 1.2rem; }
+        .panel-header h2 { font-size: 1.2rem; color: var(--shopee-orange); }
+        .btn-close-panel { background: #ef4444; border: none; color: white; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+        
+        .func-group { display: flex; flex-direction: column; gap: 0.8rem; }
+        .btn-func { width: 100%; padding: 0.75rem; background: #1a2236; border: 1px solid #2d3748; border-radius: 8px; color: #fff; font-weight: 500; text-align: left; cursor: pointer; transition: all 0.2s; }
+        .btn-func:hover { background: #242f4c; border-color: var(--shopee-orange); }
+        .btn-bypass { background: #eab308 !important; color: #000 !important; font-weight: bold; text-align: center; margin-top: 0.5rem; border: none; }
+        .btn-bypass:hover { background: #ca8a04 !important; }
+    </style>
+</head>
+<body ondblclick="verificarDoisCliques(event)">
+
+    <!-- 1. TELA DE LOGIN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>PAINEL SHOPEE</h1>
+            <div class="input-group">
+                <label>Usuário</label>
+                <input type="text" id="userInput" placeholder="Digite o usuário">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="passInput" placeholder="Digite a senha">
+            </div>
+            <button class="btn-login" onclick="executarAutenticacao()">Entrar no painel</button>
+            <div class="status-msg" id="statusMessage"></div>
+        </div>
+    </div>
+
+    <!-- 2. BOTÃO FLUTUANTE (Com o link bruto da imagem do seu repositório GitHub) -->
+    <button class="floating-btn" id="floatBtn" onclick="toggleMenuAbas()">
+        <img src="https://githubusercontent.com" alt="Shopee Logo">
+    </button>
+
+    <!-- 3. PAINEL DE FUNCIONALIDADES -->
+    <div class="main-panel" id="mainMenu">
+        <div class="panel-header">
+            <h2>Shopee Core Manager</h2>
+            <!-- Botão X para fechar e resetar tudo -->
+            <button class="btn-close-panel" onclick="excluirEResetarPainel()">X</button>
+        </div>
+        <div class="func-group">
+            <button class="btn-func" onclick="alert('Função 1: Impulsionador de Vendas Ativado (Simulado).')">⚡ Otimizar Anúncios em Lote</button>
+            <button class="btn-func" onclick="alert('Função 2: Extrator de Métricas Conectado (Simulado).')">📊 Gerador de Relatório de Conversão</button>
+            <button class="btn-func" onclick="alert('Função 3: Auto-Responder Iniciado (Simulado).')">💬 Resposta Automática no Chat</button>
+            <button class="btn-func" onclick="alert('Função 4: Multiplicador Visual Configurado (Simulado).')">👁️ Simulador de Visualizações Externas</button>
+            
+            <!-- Botão de Bypass Oculto -->
+            <button class="btn-func btn-bypass" onclick="ativarBypassModo()">Modo Oculto (Bypass)</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuração de segurança exigida
+        const CREDENCIAIS_VALIDAS = { user: "Shopeev1", pass: "Shopee77x" };
+        let bypassAtivo = false;
+
+        // Validação de entrada com delay de 2 segundos
+        function executarAutenticacao() {
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const status = document.getElementById('statusMessage');
+
+            if (user === CREDENCIAIS_VALIDAS.user && pass === CREDENCIAIS_VALIDAS.pass) {
+                status.style.color = "#00ff66";
+                status.innerText = "Checando Usuário e senha...";
+                
+                setTimeout(() => {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('floatBtn').style.display = 'block';
+                    status.innerText = "";
+                }, 2000);
+            } else {
+                status.style.color = "#ef4444";
+                status.innerText = "Credenciais inválidas. Tente novamente.";
+            }
+        }
+
+        // Abrir/Fechar a caixa de funções clicando no ícone redondo
+        function toggleMenuAbas() {
+            if (bypassAtivo) return; // Não abre se o bypass estiver ocultando o sistema
+            const menu = document.getElementById('mainMenu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Esconde o botão flutuante e o painel completamente
+        function activarBypassModo() {
+            bypassAtivo = true;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('floatBtn').style.display = 'none';
+            alert("Bypass Ativo! O painel sumiu. Dê 2 cliques em qualquer lugar limpo da tela para reaparecer.");
+        }
+
+        // Monitora cliques duplos na tela para restaurar o sistema ocultado
+        function verificarDoisCliques(event) {
+            if (bypassAtivo) {
+                // Impede que cliques acidentais em elementos internos quebrem o fluxo
+                if (event.target === document.body || event.target.tagName === 'BODY') {
+                    bypassAtivo = false;
+                    document.getElementById('floatBtn').style.display = 'block';
+                    document.getElementById('mainMenu').style.display = 'block';
+                }
+            }
+        }
+
+        // Botão X: Limpa os inputs, fecha as telas e obriga a fazer login novamente
+        function excluirEResetarPainel() {
+            document.getElementById('userInput').value = "";
+            document.getElementById('passInput').value = "";
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('floatBtn').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            bypassAtivo = false;
+            document.getElementById('statusMessage').innerText = "Aguardando novo comando...";
+        }
+    </script>
+</body>
+</html>
+
