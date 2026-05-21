@@ -3,316 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Painel Shopee Bravo VIP</title>
+    <title>Bravo Mod Menu - ESP Real Time</title>
     <style>
         :root {
             --shopee-orange: #ff4500;
             --bg-dark: #05070c;
             --panel-bg: #0f1322;
             --text-color: #ffffff;
-            --muted-color: #64748b;
-            --neon-border: #ee4d2d;
+            --esp-color: #00ff66; /* Verde Neon para o ESP */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; user-select: none; }
         body { background-color: var(--bg-dark); color: var(--text-color); min-height: 100vh; overflow: hidden; position: relative; }
 
-        /* ====== TELA DE LOGIN (PRETA) ====== */
+        /* ====== TELA DE LOGIN ====== */
         .login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; display: flex; justify-content: center; align-items: center; z-index: 10000;
         }
         .login-box { width: 100%; max-width: 340px; padding: 2rem; text-align: center; }
-        .login-box h1 { color: var(--shopee-orange); font-size: 1.6rem; margin-bottom: 2rem; font-weight: 800; letter-spacing: 2px; }
+        .login-box h1 { color: var(--shopee-orange); font-size: 1.6rem; margin-bottom: 2rem; font-weight: 800; }
         .input-group { margin-bottom: 1.2rem; text-align: left; }
-        .input-group label { display: block; font-size: 0.75rem; color: var(--muted-color); margin-bottom: 4px; text-transform: uppercase; }
-        .input-group input { width: 100%; padding: 0.8rem; background: #0c0d14; border: 1px solid #1f2438; border-radius: 10px; color: #fff; font-size: 1rem; }
-        .input-group input:focus { border-color: var(--shopee-orange); outline: none; }
-        .btn-login { width: 100%; padding: 0.9rem; background: var(--shopee-orange); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
-        .status-msg { margin-top: 1rem; font-family: monospace; font-size: 0.85rem; color: #00ff66; min-height: 20px; }
+        .input-group label { display: block; font-size: 0.75rem; color: #64748b; margin-bottom: 4px; }
+        .input-group input { width: 100%; padding: 0.8rem; background: #0c0d14; border: 1px solid #1f2438; border-radius: 10px; color: #fff; }
+        .btn-login { width: 100%; padding: 0.9rem; background: var(--shopee-orange); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+        .status-msg { margin-top: 1rem; font-family: monospace; font-size: 0.85rem; color: #00ff66; }
 
-        /* ====== BOTÃO FLUTUANTE ARRASTÁVEL ====== */
+        /* ====== BOLINHA FLUTUANTE ARRASTÁVEL ====== */
         .floating-btn {
-            position: fixed; bottom: 80px; right: 20px; width: 65px; height: 65px;
+            position: fixed; top: 100px; left: 20px; width: 60px; height: 60px;
             background-color: var(--shopee-orange); border-radius: 50%;
-            box-shadow: 0 0 15px rgba(238, 77, 45, 0.4); border: 2px solid #fff;
-            cursor: grab; display: none; overflow: hidden; z-index: 9999;
+            box-shadow: 0 0 15px rgba(238, 77, 45, 0.6); border: 2px solid #fff;
+            cursor: move; display: none; overflow: hidden; z-index: 9999;
             touch-action: none;
         }
-        .floating-btn:active { cursor: grabbing; }
         .floating-btn img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-        /* ====== PAINEL PRINCIPAL DE ESTILO MENU INJETOR ====== */
+        /* ====== PAINEL DE CONTROLE ====== */
         .main-panel {
-            position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 360px; background: var(--panel-bg);
-            border: 2px solid var(--neon-border); border-radius: 14px;
+            position: fixed; top: 30px; left: 30px;
+            width: 280px; background: var(--panel-bg);
+            border: 2px solid var(--shopee-orange); border-radius: 12px;
             box-shadow: 0 0 30px rgba(0,0,0,0.8); display: none; z-index: 9998;
-            overflow: hidden;
         }
-        .panel-header { background: #090c16; padding: 0.8rem 1.2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a2238; }
-        .panel-header h2 { font-size: 1.1rem; color: var(--shopee-orange); letter-spacing: 1px; font-weight: 800; }
-        .btn-close-panel { background: #ff3333; border: none; color: white; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
+        .panel-header { background: #090c16; padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .panel-header h2 { font-size: 1rem; color: var(--shopee-orange); }
+        .btn-close { background: #ff3333; border: none; color: white; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; }
         
-        /* Sistema de Abas */
-        .tab-nav { display: flex; background: #0c0e1a; border-bottom: 1px solid #1a2238; overflow-x: auto; }
-        .tab-btn { flex: 1; min-width: 80px; padding: 0.6rem; background: transparent; border: none; color: var(--muted-color); font-weight: bold; font-size: 0.75rem; cursor: pointer; text-transform: uppercase; white-space: nowrap; }
-        .tab-btn.active { color: var(--shopee-orange); border-bottom: 2px solid var(--shopee-orange); background: rgba(255,255,255,0.02); }
-        
-        .tab-content { padding: 1.2rem; display: none; flex-direction: column; gap: 0.8rem; max-height: 300px; overflow-y: auto; }
-        .tab-content.active { display: flex; }
-        
-        .section-title { font-size: 0.75rem; color: var(--shopee-orange); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; margin-bottom: 2px; }
-        
-        /* Linhas de Opções (Toggles e Sliders) */
-        .menu-item { display: flex; justify-content: space-between; align-items: center; background: #090b14; padding: 0.7rem 1rem; border-radius: 8px; border: 1px solid #151a2e; }
-        .menu-item span { font-size: 0.85rem; font-weight: 500; }
-        
-        .range-item { background: #090b14; padding: 0.7rem 1rem; border-radius: 8px; border: 1px solid #151a2e; display: flex; flex-direction: column; gap: 6px; }
-        .range-item label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 500; }
-        .range-item input[type="range"] { width: 100%; accent-color: var(--shopee-orange); background: #242b42; height: 5px; border-radius: 3px; cursor: pointer; -webkit-appearance: none; }
+        .panel-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; background: #090b14; padding: 0.6rem 0.8rem; border-radius: 8px; }
+        .menu-item span { font-size: 0.8rem; }
 
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        /* Switch Toggle */
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
         .switch input { display: none; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #242b42; transition: .3s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--shopee-orange); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked + .slider:before { transform: translateX(16px); }
 
-        .btn-action { width: 100%; padding: 0.75rem; background: #161c30; border: 1px solid #252f4f; border-radius: 8px; color: #fff; font-size: 0.85rem; font-weight: bold; cursor: pointer; text-align: center; }
+        /* ====== RENDERIZADOR REAL DO ESP (TELA DO JOGO SIMULADA) ====== */
+        .esp-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; /* Deixa clicar através do ESP */
+            z-index: 5000;
+            display: none;
+        }
+        /* Elementos visuais do ESP */
+        .esp-box {
+            position: absolute; border: 2px solid var(--esp-color);
+            box-shadow: 0 0 8px var(--esp-color); display: none;
+        }
+        .esp-line {
+            position: absolute; background-color: var(--esp-color);
+            width: 2px; transform-origin: top center; display: none;
+        }
+        .esp-text {
+            position: absolute; color: var(--esp-color); font-size: 11px;
+            font-weight: bold; font-family: monospace; white-space: nowrap;
+            top: -18px; left: 0; text-shadow: 1px 1px #000;
+        }
     </style>
 </head>
-<body ondblclick="verificarDoisCliques(event)">
+<body>
 
     <!-- 1. TELA DE LOGIN -->
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
-            <h1>SHOPEE BRAVO VIP</h1>
+            <h1>BRAVO VIP LOGIN</h1>
             <div class="input-group">
                 <label>Usuário</label>
-                <input type="text" id="userInput" placeholder="Shopeev1">
+                <input type="text" id="userInput" placeholder="Shopeev1" value="Shopeev1">
             </div>
             <div class="input-group">
                 <label>Senha</label>
-                <input type="password" id="passInput" placeholder="••••••••">
+                <input type="password" id="passInput" placeholder="••••••••" value="Shopee77x">
             </div>
-            <button class="btn-login" onclick="ejecutarAutenticacao()">Entrar no painel</button>
+            <button class="btn-login" onclick="autenticar()">Entrar no Painel</button>
             <div class="status-msg" id="statusMessage"></div>
         </div>
     </div>
 
     <!-- 2. BOTÃO FLUTUANTE ARRASTÁVEL -->
     <div class="floating-btn" id="floatBtn">
-        <img src="https://githubusercontent.com" alt="Shopee Logo">
+        <img src="https://githubusercontent.com" alt="Icon">
     </div>
 
-    <!-- 3. PAINEL ESTILO BRAVO INJECTOR COM OPÇÕES REAIS -->
+    <!-- 3. MENU DE SELEÇÃO ESP -->
     <div class="main-panel" id="mainMenu">
         <div class="panel-header">
-            <h2>SHOPEE CHEAT MENU</h2>
-            <button class="btn-close-panel" onclick="excluirEResetarPainel()">X</button>
+            <h2>BRAVO ESP CONTROL</h2>
+            <button class="btn-close" onclick="fecharEApagarTudo()">X</button>
         </div>
-        
-        <!-- Abas de Navegação -->
-        <div class="tab-nav">
-            <button class="tab-btn active" onclick="mudarAba('abaAim', this)">Aim Control</button>
-            <button class="tab-btn" onclick="mudarAba('abaEsp', this)">ESP Visual</button>
-            <button class="tab-btn" onclick="mudarAba('abaReg', this)">Regedit</button>
-            <button class="tab-btn" onclick="mudarAba('abaBypass', this)">Bypass</button>
+        <div class="panel-body">
+            <div class="menu-item">
+                <span>📏 Ativar ESP Linhas</span>
+                <label class="switch"><input type="checkbox" id="toggleLines" onchange="atualizarESP()"><span class="slider"></span></label>
+            </div>
+            <div class="menu-item">
+                <span>📦 Ativar ESP Caixas</span>
+                <label class="switch"><input type="checkbox" id="toggleBoxes" onchange="atualizarESP()"><span class="slider"></span></label>
+            </div>
         </div>
+    </div>
 
-        <!-- ABA 1: AIM CONTROL (MIRA) -->
-        <div class="tab-content active" id="abaAim">
-            <div class="section-title">Aimbot Core</div>
-            <div class="menu-item">
-                <span>🎯 Travar Mira (Aim Lock)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>🔥 Aim Quando Atirar (On Fire)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="range-item">
-                <label>Campo de Visão (Aim FOV): <span id="fovVal">120°</span></label>
-                <input type="range" min="10" max="360" value="120" oninput="document.getElementById('fovVal').innerText = this.value + '°'">
-            </div>
-            <div class="range-item">
-                <label>Suavidade do Arraste (Smooth): <span id="smoothVal">5x</span></label>
-                <input type="range" min="1" max="20" value="5" oninput="document.getElementById('smoothVal').innerText = this.value + 'x'">
-            </div>
+    <!-- 4. CAMADA DO ESP FUNCIONAL (RENDERIZADOR) -->
+    <div class="esp-container" id="espLayer">
+        <!-- Inimigo Simulado 1 -->
+        <div class="esp-box" id="box1" style="top: 30%; left: 40%; width: 80px; height: 140px;">
+            <div class="esp-text">INIMIGO_01 [14m] - HP: 100</div>
         </div>
+        <div class="esp-line" id="line1"></div>
 
-        <!-- ABA 2: ESP VISUAL (WALLHACK) -->
-        <div class="tab-content" id="abaEsp">
-            <div class="section-title">Configurações de Antena</div>
-            <div class="menu-item">
-                <span>📏 Desenhar Linha (ESP Line)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>📦 Caixa 3D (ESP Box)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>❤️ Mostrar Vida (ESP Health)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>📛 Identificar Nome (ESP Name)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
+        <!-- Inimigo Simulado 2 -->
+        <div class="esp-box" id="box2" style="top: 45%; left: 70%; width: 60px; height: 100px;">
+            <div class="esp-text">INIMIGO_02 [42m] - HP: 74</div>
         </div>
-
-        <!-- ABA 3: REGEDIT (SENSI) -->
-        <div class="tab-content" id="abaReg">
-            <div class="section-title">Modificadores de Arquivo</div>
-            <div class="menu-item">
-                <span>⚙️ Injetar Regedit Mobile (iOS/Android)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>🛑 Estabilizador (Anti-Recoil)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="range-item">
-                <label>Sensibilidade Eixo X: <span id="sensiX">85%</span></label>
-                <input type="range" min="0" max="100" value="85" oninput="document.getElementById('sensiX').innerText = this.value + '%'">
-            </div>
-            <div class="range-item">
-                <label>Sensibilidade Eixo Y: <span id="sensiY">95%</span></label>
-                <input type="range" min="0" max="100" value="95" oninput="document.getElementById('sensiY').innerText = this.value + '%'">
-            </div>
-        </div>
-
-        <!-- ABA 4: BYPASS (SEGURANÇA DO AGENTE) -->
-        <div class="tab-content" id="abaBypass">
-            <div class="section-title">Segurança Interna</div>
-            <div class="menu-item">
-                <span>🛡️ Escudo Anti-Ban (Bypass Active)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="menu-item">
-                <span>🧹 Limpar Registros Locais (Clear Logs)</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="section-title">Ocultação</div>
-            <button class="btn-action" style="background: #eab308; color: #000;" onclick="ativarBypassModo()">Ativar Modo Invisível (Ocultar)</button>
-        </div>
+        <div class="esp-line" id="line2"></div>
     </div>
 
     <script>
         const CREDENCIAIS = { user: "Shopeev1", pass: "Shopee77x" };
-        let bypassAtivo = false;
 
-        // Login com verificação
-        function ejecutarAutenticacao() {
-            const user = document.getElementById('userInput').value;
-            const pass = document.getElementById('passInput').value;
-            const status = document.getElementById('statusMessage');
+        function autenticar() {
+            const u = document.getElementById('userInput').value;
+            const p = document.getElementById('passInput').value;
+            const msg = document.getElementById('statusMessage');
 
-            if (user === CREDENCIAIS.user && pass === CREDENCIAIS.pass) {
-                status.style.color = "#00ff66";
-                status.innerText = "Checando Usuário e senha...";
+            if (u === CREDENCIAIS.user && p === CREDENCIAIS.pass) {
+                msg.innerText = "Injetando chaves...";
                 setTimeout(() => {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('floatBtn').style.display = 'block';
-                }, 2000);
+                    document.getElementById('espLayer').style.display = 'block';
+                    calcularLinhasDoESP(); // Calcula as posições iniciais das linhas
+                }, 1500);
             } else {
-                status.style.color = "#ef4444";
-                status.innerText = "Usuário ou Senha incorretos!";
+                msg.style.color = "red";
+                msg.innerText = "Acesso negado.";
             }
         }
 
-        // Alternador de Abas
-        function mudarAba(idAba, botao) {
-            document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(idAba).classList.add('active');
-            botao.classList.add('active');
+        // Liga e desliga as linhas ou caixas baseado nos Switches marcados
+        function atualizarESP() {
+            const linesActive = document.getElementById('toggleLines').checked;
+            const boxesActive = document.getElementById('toggleBoxes').checked;
+
+            document.getElementById('box1').style.display = boxesActive ? 'block' : 'none';
+            document.getElementById('box2').style.display = boxesActive ? 'block' : 'none';
+            document.getElementById('line1').style.display = linesActive ? 'block' : 'none';
+            document.getElementById('line2').style.display = linesActive ? 'block' : 'none';
+            
+            if (linesActive) calcularLinhasDoESP();
         }
 
-        // Modo Oculto (Bypass)
-        function activarBypassModo() {
-            bypassAtivo = true;
+        // Função matemática pura que desenha a linha saindo do centro do topo até o "inimigo"
+        function calcularLinhasDoESP() {
+            desenharLinhaDeAntena('line1', 'box1');
+            desenharLinhaDeAntena('line2', 'box2');
+        }
+
+        function desenharLinhaDeAntena(idLinha, idAlvo) {
+            const linha = document.getElementById(idLinha);
+            const alvo = document.getElementById(idAlvo);
+            const rect = alvo.getBoundingClientRect();
+
+            // Ponto de origem da antena: Centro superior da tela
+            const xOrigem = window.innerWidth / 2;
+            const yOrigem = 0;
+
+            // Ponto de destino da antena: Cabeça do inimigo (topo da caixa)
+            const xDestino = rect.left + (rect.width / 2);
+            const yDestino = rect.top;
+
+            // Teorema de Pitágoras para obter o tamanho exato da linha visual
+            const distancia = Math.hypot(xDestino - xOrigem, yDestino - yOrigem);
+            const angulo = Math.atan2(xDestino - xOrigem, yOrigem - yDestino) * (180 / Math.PI);
+
+            linha.style.height = distancia + 'px';
+            linha.style.left = xOrigem + 'px';
+            linha.style.top = yOrigem + 'px';
+            linha.style.transform = `rotate(${angulo}deg)`;
+        }
+
+        // Reajusta as linhas caso você mude o celular deitado/em pé
+        window.addEventListener('resize', calcularLinhasDoESP);
+
+        // FECHAR TUDO (Botão X)
+        function fecharEApagarTudo() {
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('floatBtn').style.display = 'none';
-            alert("Painel Invisível! Dê 2 cliques rápidos em um local vazio da tela para trazê-lo de volta.");
-        }
-
-        // Restaura com clique duplo
-        function verificarDoisCliques(event) {
-            if (bypassAtivo && (event.target === document.body || event.target.tagName === 'BODY')) {
-                bypassAtivo = false;
-                document.getElementById('floatBtn').style.display = 'block';
-                document.getElementById('mainMenu').style.display = 'block';
-            }
-        }
-
-        // Reseta tudo ao clicar no X
-        function excluirEResetarPainel() {
-            document.getElementById('userInput').value = "";
-            document.getElementById('passInput').value = "";
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('floatBtn').style.display = 'none';
+            document.getElementById('espLayer').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('statusMessage').innerText = "";
-            bypassAtivo = false;
+            document.getElementById('toggleLines').checked = false;
+            document.getElementById('toggleBoxes').checked = false;
         }
 
-        // ====== MECANISMO DE ARRASTO DA BOLINHA (TOUCH & MOUSE ENGINE) ======
-        const floatBtn = document.getElementById('floatBtn');
-        let isDragging = false;
-        let startX, startY, initialX, initialY;
-        let moved = false;
+        // ====== ENGINE DE ARRASTO DA BOLINHA CORRIGIDO ======
+        const btn = document.getElementById('floatBtn');
+        let dragging = false, sX, sY, iX, iY, moved = false;
 
-        floatBtn.addEventListener('mousedown', startDrag);
-        floatBtn.addEventListener('touchstart', startDrag, { passive: true });
+        btn.addEventListener('mousedown', start);
+        btn.addEventListener('touchstart', start, { passive: true });
 
-        function startDrag(e) {
-            isDragging = true;
-            moved = false;
-            const clientX = e.touches ? e.touches[clientX] : e.clientX;
-            const clientY = e.touches ? e.touches[clientY] : e.clientY;
-            
-            startX = e.touches ? e.touches[0].clientX : e.clientX;
-            startY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            const rect = floatBtn.getBoundingClientRect();
-            initialX = rect.left;
-            initialY = rect.top;
+        function start(e) {
+            dragging = true; moved = false;
+            const cX = e.touches ? e.touches[0].clientX : e.clientX;
+            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            sX = cX; sY = cY;
+            const r = btn.getBoundingClientRect();
+            iX = r.left; iY = r.top;
 
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('touchmove', drag, { passive: false });
-            document.addEventListener('mouseup', stopDrag);
-            document.addEventListener('touchend', stopDrag);
+            document.addEventListener('mousemove', move);
+            document.addEventListener('touchmove', move, { passive: false });
+            document.addEventListener('mouseup', end);
+            document.addEventListener('touchend', end);
         }
 
-        function drag(e) {
-            if (!isDragging) return;
+        function move(e) {
+            if (!dragging) return;
             if (e.cancelable) e.preventDefault();
+            const cX = e.touches ? e.touches[0].clientX : e.clientX;
+            const cY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let dX = cX - sX;
+            let dY = cY - sY;
+            if (Math.abs(dX) > 5 || Math.abs(dY) > 5) moved = true;
 
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            const deltaX = clientX - startX;
-            const deltaY = clientY - startY;
-
-            if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
-                moved = true;
-            }
-
-            floatBtn.style.left = (initialX + deltaX) + 'px';
-            floatBtn.style.top = (initialY + deltaY) + 'px';
-            floatBtn.style.bottom = 'auto';
-            floatBtn.style.right = 'auto';
+            btn.style.left = (iX + dX) + 'px';
+            btn.style.top = (iY + dY) + 'px';
         }
 
-        function stopDrag() {
-            isDragging = false;
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('touchmove', drag);
+        function end() {
+            dragging = false;
+            document.removeEventListener('mousemove', move);
+            document.removeEventListener('touchmove', move);
             
-            if (!moved && !bypassAtivo) {
+            // Corrigido: Clicar abre/fecha sem bugar ou sumir sozinho
+            if (!moved) {
                 const menu = document.getElementById('mainMenu');
                 menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
             }
